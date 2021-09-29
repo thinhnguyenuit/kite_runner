@@ -86,6 +86,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+
 export default {
   name: "RwvHeader",
   computed: {

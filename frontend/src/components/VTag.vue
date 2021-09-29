@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: "KrvTag",
+  name: "RwvTag",
   props: {
     name: {
       type: String,
