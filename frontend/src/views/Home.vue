@@ -3,7 +3,7 @@
     <div class="banner">
       <div class="container">
         <h1 class="logo-font">Kite Runner</h1>
-        <p>A place to share your knowledge.</p>
+        <p>To err is human. To write, divine.</p>
       </div>
     </div>
     <div class="container page">
