@@ -47,8 +47,8 @@
           <div class="sidebar">
             <p>Popular Tags</p>
             <div class="tag-list">
-              <KrvTag v-for="(tag, index) in tags" :name="tag" :key="index">
-              </KrvTag>
+              <RwvTag v-for="(tag, index) in tags" :name="tag" :key="index">
+              </RwvTag>
             </div>
           </div>
         </div>
@@ -59,12 +59,13 @@
 
 <script>
 import { mapGetters } from "vuex";
-import KrvTag from "@/components/VTag";
+import RwvTag from "@/components/VTag";
 import { FETCH_TAGS } from "@/store/actions.type";
+
 export default {
   name: "home",
   components: {
-    KrvTag,
+    RwvTag,
   },
   mounted() {
     this.$store.dispatch(FETCH_TAGS);
