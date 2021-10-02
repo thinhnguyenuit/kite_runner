@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kite_runner.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "kite_runner.settings")
 
 application = get_asgi_application()

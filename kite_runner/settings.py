@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 from typing import List
+
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -142,6 +143,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
@@ -165,5 +167,6 @@ ADMINS = [("""Thinh Nguyen""", "dangthinhvh@gmail.com")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
 
-APPEND_SLASH = False
+APPEND_SLASH = True
 CORS_URLS_REGEX = r"^/api/.*$"
+AUTH_USER_MODEL = "kite_runner.User"
