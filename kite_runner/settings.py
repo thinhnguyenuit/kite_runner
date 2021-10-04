@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # 3rd party
     "rest_framework",
+    "corsheaders",
     # local
     "kite_runner.apps.KiteRunnerConfig",
 ]
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "kite_runner.urls"
@@ -85,12 +87,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "kite_runner.wsgi.application"
 
+INTERNAL_IPS = ["127.0.0.1", "172.18.0.1"]  # Docker IP
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": env.str("DJANGO_DB_NAME", default="kite_runner"),
+        "USER": env.str("DJANGO_DB_USER", default="kite_runner"),
+        "PASSWORD": env.str("DJANGO_DB_PASSWORD", default="kite_runner"),
+        "HOST": env.str("DJANGO_DB_HOST", default="localhost"),
+        "PORT": env.str("DJANGO_DB_PORT", default="5432"),
+        "OPTIONS": {
+            "options": "-c search_path=kite_runner,public"
+        },
+        "TEST": {
+            "NAME": "test_db"
+        }
+    }
+}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+DATABASES["default"]["TEST"] = {"NAME": "test_db"}
 
 
 # Password validation

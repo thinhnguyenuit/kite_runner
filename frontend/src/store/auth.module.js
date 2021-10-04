@@ -27,7 +27,7 @@ const getters = {
 const actions = {
   [LOGIN](context, credentials) {
     return new Promise((resolve) => {
-      ApiService.post("users/login", { user: credentials })
+      ApiService.post("users/login/", { user: credentials })
         .then(({ data }) => {
           context.commit(SET_AUTH, data.user);
           resolve(data);
@@ -42,7 +42,7 @@ const actions = {
   },
   [REGISTER](context, credentials) {
     return new Promise((resolve, reject) => {
-      ApiService.post("users", { user: credentials })
+      ApiService.post("users/", { user: credentials })
         .then(({ data }) => {
           context.commit(SET_AUTH, data.user);
           resolve(data);
