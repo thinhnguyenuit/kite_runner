@@ -3,12 +3,14 @@ from rest_framework import permissions, serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .renderer import UserJSONRenderer
+
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     username = serializers.CharField(max_length=False, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
-    token = serializers.CharField(max_length=255, read_only=True)
+    token = serializers.CharField(read_only=True)
 
     def validate(self, data):
         email = data.get("email", None)
@@ -28,6 +30,7 @@ class LoginSerializer(serializers.Serializer):
 class LoginViewSet(APIView):
     serializer_class = LoginSerializer
     permission_classes = (permissions.AllowAny,)
+    renderer_classes = (UserJSONRenderer,)
 
     def post(self, request):
         user = request.data.get("user", None)

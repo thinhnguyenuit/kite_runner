@@ -53,7 +53,7 @@ class User(AbstractUser):
     def get_short_name(self):
         return self.username
 
-    def _gererate_jwt_token(self):
+    def _gererate_jwt_token(self) -> str:
         dt = datetime.now() + timedelta(days=60)
         return jwt.encode(
             {"id": self.pk, "exp": dt},

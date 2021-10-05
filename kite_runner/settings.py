@@ -101,12 +101,8 @@ DATABASES = {
         "PASSWORD": env.str("DJANGO_DB_PASSWORD", default="kite_runner"),
         "HOST": env.str("DJANGO_DB_HOST", default="localhost"),
         "PORT": env.str("DJANGO_DB_PORT", default="5432"),
-        "OPTIONS": {
-            "options": "-c search_path=kite_runner,public"
-        },
-        "TEST": {
-            "NAME": "test_db"
-        }
+        "OPTIONS": {"options": "-c search_path=kite_runner,public"},
+        "TEST": {"NAME": "test_db"},
     }
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
@@ -166,6 +162,8 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "NON_FIELD_ERRORS_KEY": "error",
+    "EXCEPTION_HANDLER": "kite_runner.exceptions.core_exception_handler",
 }
 
 # EMAIL

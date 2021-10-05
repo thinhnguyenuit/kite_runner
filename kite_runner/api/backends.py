@@ -1,6 +1,8 @@
+from typing import Tuple
+
 import jwt
 from django.conf import settings
-from rest_framework import authentication, exceptions
+from rest_framework import authentication, exceptions, request
 
 from kite_runner.models.user import User
 
@@ -25,7 +27,9 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
         return self._authenticate_credentials(request, token)
 
-    def _authenticate_credentials(self, request, token):
+    def _authenticate_credentials(
+        self, request: request, token: str
+    ) -> Tuple[User, str]:
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
         except:

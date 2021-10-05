@@ -1,10 +1,12 @@
 from django.contrib.auth import password_validation
-from rest_framework import generics, permissions, serializers, validators, status
+from rest_framework import (generics, permissions, serializers, status,
+                            validators)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from kite_runner.models.user import User
-import json
+
+from .renderer import UserJSONRenderer
 
 
 class SignupSerializer(serializers.Serializer):
@@ -35,9 +37,10 @@ class SignupSerializer(serializers.Serializer):
         return User.objects.create_user(**validated_data)
 
 
-class SignupViewSet(generics.CreateAPIView):
+class SignupViewSet(APIView):
     serializer_class = SignupSerializer
     permission_classes = (permissions.AllowAny,)
+    renderer_classes = (UserJSONRenderer,)
 
     def post(self, request):
         user = request.data.get("user", {})
