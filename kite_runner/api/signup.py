@@ -1,6 +1,5 @@
 from django.contrib.auth import password_validation
-from rest_framework import (generics, permissions, serializers, status,
-                            validators)
+from rest_framework import permissions, serializers, status, validators
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -37,7 +36,7 @@ class SignupSerializer(serializers.Serializer):
         return User.objects.create_user(**validated_data)
 
 
-class SignupViewSet(APIView):
+class SignupAPIView(APIView):
     serializer_class = SignupSerializer
     permission_classes = (permissions.AllowAny,)
     renderer_classes = (UserJSONRenderer,)
