@@ -2,7 +2,8 @@ from django.contrib.auth import authenticate
 from rest_framework import permissions, serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
+
+from kite_runner.utils import tokens
 
 from .renderer import UserJSONRenderer
 
@@ -18,7 +19,6 @@ class LoginSerializer(serializers.Serializer):
     def to_representation(self, value):
         return value
 
-
     def validate(self, data):
         email = data.get("email", None)
         password = data.get("password", None)
@@ -31,12 +31,11 @@ class LoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError("Invalid credentials")
 
-        return {"email": user.email, "username": user.username, "token": self.get_token(user)}
-
-    @staticmethod
-    def get_token(obj):
-        token, _ = Token.objects.get_or_create(user=obj)
-        return token.key
+        return {
+            "email": user.email,
+            "username": user.username,
+            "token": tokens.get_user_token(user),
+        }
 
 
 class LoginViewSet(APIView):

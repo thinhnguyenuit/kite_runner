@@ -2,7 +2,6 @@ from typing import Optional
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from rest_framework.authtoken.models import Token
 
 
 class UserManager(BaseUserManager):

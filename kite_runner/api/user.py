@@ -1,23 +1,29 @@
-from rest_framework import serializers
-
-from kite_runner.models import User
-from kite_runner.api.profile import ProfileSerializer
+from rest_framework import serializers, status
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
-from .renderer import UserJSONRenderer
 from rest_framework.response import Response
-from rest_framework import status
+
+from kite_runner.api.profile import ProfileSerializer
+from kite_runner.models import User
+from kite_runner.utils import tokens
+
+from .renderer import UserJSONRenderer
 
 
 class UserSerializer(serializers.ModelSerializer):
 
+    token = serializers.SerializerMethodField()
     profile = ProfileSerializer(write_only=True)
     bio = serializers.CharField(source="profile.bio", read_only=True)
-    image = serializers.ImageField(source="profile.image", read_only=True)
+    image = serializers.URLField(source="profile.image", read_only=True)
 
     class Meta:
         model = User
-        fields = ["email", "token", "username", "bio", "image"]
+        fields = ["email", "token", "username", "bio", "image", "profile"]
+        read_only_fields = ("token",)
+
+    def get_token(self, obj: "User") -> str:
+        return tokens.get_user_token(obj)
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
@@ -49,13 +55,15 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        user_date = request.data.get("user", {})
+        user_data = request.data.get("user", {})
 
         serializer_data = {
-            "username": user_date.get("username", request.user.username),
-            "email": user_date.get("email", request.user.email),
-            "password": user_date.get("password", request.user.password),
-            "bio": user_date.get("bio", request.user.bio),
+            "username": user_data.get("username", request.user.username),
+            "email": user_data.get("email", request.user.email),
+            "profile": {
+                "bio": user_data.get("bio", request.user.profile.bio),
+                "image": user_data.get("image", request.user.profile.image),
+            },
         }
 
         serializer = self.serializer_class(

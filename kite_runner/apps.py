@@ -6,4 +6,4 @@ class KiteRunnerConfig(AppConfig):
     verbose_name = "KiteRunner"
 
     def ready(self):
-        from . import signals
+        from . import signals  # noqa: F401
