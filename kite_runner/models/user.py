@@ -1,10 +1,8 @@
-from datetime import datetime, timedelta
 from typing import Optional
 
-import jwt
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from rest_framework.authtoken.models import Token
 
 
 class UserManager(BaseUserManager):
@@ -40,10 +38,6 @@ class User(AbstractUser):
     def is_superuser(self):
         return self.is_staff
 
-    @property
-    def token(self):
-        return self._gererate_jwt_token()
-
     def __str__(self):
         return self.email
 
@@ -52,11 +46,3 @@ class User(AbstractUser):
 
     def get_short_name(self):
         return self.username
-
-    def _gererate_jwt_token(self) -> str:
-        dt = datetime.now() + timedelta(days=60)
-        return jwt.encode(
-            {"id": self.pk, "exp": dt},
-            settings.SECRET_KEY,
-            algorithm="HS256",
-        )

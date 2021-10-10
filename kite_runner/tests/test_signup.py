@@ -1,7 +1,6 @@
 # from kite_runner.tests.base import APIBaseTest
 from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APIClient
 
 
 class TestSignupAPI(TestCase):
@@ -19,6 +18,8 @@ class TestSignupAPI(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.json()["user"]["username"], "test_user")
+        self.assertEqual(response.json()["user"]["email"], "test@mail.com")
 
     def test_api_sign_up_already_exist(self):
         response = self.client.post(

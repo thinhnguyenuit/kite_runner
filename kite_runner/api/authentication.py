@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate
 from rest_framework import permissions, serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 
 from .renderer import UserJSONRenderer
 
@@ -10,7 +11,13 @@ class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     username = serializers.CharField(max_length=False, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
-    token = serializers.CharField(read_only=True)
+
+    class Meta:
+        fields = ("email", "username", "password", "token")
+
+    def to_representation(self, value):
+        return value
+
 
     def validate(self, data):
         email = data.get("email", None)
@@ -24,7 +31,12 @@ class LoginSerializer(serializers.Serializer):
         if user is None:
             raise serializers.ValidationError("Invalid credentials")
 
-        return {"email": user.email, "username": user.username, "token": user.token}
+        return {"email": user.email, "username": user.username, "token": self.get_token(user)}
+
+    @staticmethod
+    def get_token(obj):
+        token, _ = Token.objects.get_or_create(user=obj)
+        return token.key
 
 
 class LoginViewSet(APIView):
