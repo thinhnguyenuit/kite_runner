@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from kite_runner.models import Profile
+from kite_runner.utils.constants import DEFAULT_AVT_IMAGE
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -18,7 +19,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         if obj.image:
             return obj.image
 
-        return "https://www.gravatar.com/avatar/73af357c60e22857eda9a5dbf106e2f0"
+        return DEFAULT_AVT_IMAGE
 
     def get_following(self, instance):
         request = self.context.get("request")

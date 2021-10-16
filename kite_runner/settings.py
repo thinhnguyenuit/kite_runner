@@ -164,6 +164,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "NON_FIELD_ERRORS_KEY": "error",
     "EXCEPTION_HANDLER": "kite_runner.exceptions.core_exception_handler",
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
 # EMAIL
