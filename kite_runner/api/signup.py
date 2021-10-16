@@ -3,11 +3,11 @@ from rest_framework import permissions, serializers, status, validators
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from kite_runner.models import User
 from kite_runner.api.profile import ProfileSerializer
+from kite_runner.models import User
+from kite_runner.utils import tokens
 
 from .renderer import UserJSONRenderer
-from kite_runner.utils import tokens
 
 
 class SignupSerializer(serializers.ModelSerializer):

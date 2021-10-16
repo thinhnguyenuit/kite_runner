@@ -1,5 +1,6 @@
-from .base import APIBaseTest
 from rest_framework import status
+
+from .base import APIBaseTest
 
 
 class TestAuthentication(APIBaseTest):

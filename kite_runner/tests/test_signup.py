@@ -1,8 +1,11 @@
 # from kite_runner.tests.base import APIBaseTest
-from rest_framework import status
-from kite_runner.models import User
 from typing import cast
+
+from rest_framework import status
+
+from kite_runner.models import User
 from kite_runner.utils import tokens
+
 from .base import APIBaseTest
 
 

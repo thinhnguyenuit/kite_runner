@@ -1,12 +1,13 @@
-from kite_runner.models import User
-from rest_framework.authtoken.models import Token
 from typing import Any, Dict, Optional
-from django.test import TestCase
+
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase as DRFTestCase
+
+from kite_runner.models import User
 from kite_runner.utils.constants import DEFAULT_AVT_IMAGE
 
 
-def _setup_test_data(klass):
+def _setup_test_data(klass: Any) -> None:
     klass.user = User.objects.create_user(
         email=klass.EMAIL, password=klass.PASSWORD, username=klass.USERNAME
     )
@@ -25,7 +26,7 @@ def _setup_test_data(klass):
 class ErrorResponseMixin:
     def unauthenticated_response(
         self, message: str = "Authentication credentials were not provided."
-    ) -> Dict[str, Optional[str]]:
+    ) -> Dict[str, Dict[str, str]]:
         return {"errors": {"detail": message}}
 
 
@@ -37,7 +38,7 @@ class TestMixin:
     IMAGE: str = DEFAULT_AVT_IMAGE
     user_response: Dict
 
-    user: Optional[User] = None
+    user: User
 
     def _create_user(self, email: str, password: str, username: str) -> User:
         return User.objects.create_user(

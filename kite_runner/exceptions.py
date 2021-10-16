@@ -37,7 +37,10 @@ def _handle_not_found(exc, context, response) -> Response:  # type: ignore
 
     return response
 
+
 def _handle_not_authenticated(exc, context, response) -> Response:  # type: ignore
-    response.data = {"errors": {"detail": "Authentication credentials were not provided."}}
+    response.data = {
+        "errors": {"detail": "Authentication credentials were not provided."}
+    }
     response.status_code = 401
     return response
