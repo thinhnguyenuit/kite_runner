@@ -2,24 +2,29 @@ from copy import deepcopy
 
 from rest_framework import status
 
+from kite_runner.utils.constants import TOKEN_HEADER
+
 from .base import APIBaseTest
 
 
 class TestUserAPI(APIBaseTest):
+
+    user_api_url = "/api/v1/user/"
+
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()  # type: ignore
+        super().setup_test_data()  # type: ignore
 
     def test_get_current_user(self):
         response = self.client.get(
-            "/api/v1/user/", HTTP_AUTHORIZATION="Token {}".format(self.token[0].key)
+            self.user_api_url, HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key)
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), self.user_response)
 
     def test_get_current_user_unauthorized(self):
-        response = self.client.get("/api/v1/user/")
+        response = self.client.get(self.user_api_url)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.json(), self.unauthenticated_response())
@@ -35,7 +40,7 @@ class TestUserAPI(APIBaseTest):
             }
         }
         response = self.client.put(
-            "/api/v1/user/",
+            self.user_api_url,
             data=user_update_data,
             HTTP_AUTHORIZATION="Token {}".format(self.token[0].key),
         )
@@ -49,7 +54,7 @@ class TestUserAPI(APIBaseTest):
         update_user_reponse["user"]["email"] = "update_email@mail.com"
 
         response = self.client.patch(
-            "/api/v1/user/",
+            self.user_api_url,
             data=user_update_data,
             HTTP_AUTHORIZATION="Token {}".format(self.token[0].key),
         )

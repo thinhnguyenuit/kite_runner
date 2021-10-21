@@ -28,9 +28,7 @@ def _handle_not_found(exc, context, response) -> Response:  # type: ignore
     view = context.get("view", None)
 
     if view and hasattr(view, "queryset") and view.queryset is not None:
-        error_key = view.queryset.model._meta.verbose_name
-
-        response.data = {"errors": {error_key: response.data["detail"]}}
+        response.data = {"errors": {"detail": response.data["detail"]}}
 
     else:
         response = _handle_generic_error(exc, context, response)

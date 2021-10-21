@@ -13,3 +13,10 @@ class UserJSONRenderer(KRJSONRenderer):
             data["token"] = token.decode("utf-8")
 
         return super(UserJSONRenderer, self).render(data)  # type: ignore
+
+
+class ProfileJSONRenderer(KRJSONRenderer):
+    charset = "utf-8"
+    object_label = "profile"
+    pagination_object_label = "profiles"
+    pagination_count_label = "profilesCount"

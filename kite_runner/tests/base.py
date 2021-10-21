@@ -29,11 +29,16 @@ class ErrorResponseMixin:
     ) -> Dict[str, Dict[str, str]]:
         return {"errors": {"detail": message}}
 
+    def not_found_response(
+        self, message: str = "Not found."
+    ) -> Dict[str, Dict[str, str]]:
+        return {"errors": {"detail": message}}
+
 
 class TestMixin:
-    EMAIL: str = "someuser@kiterunner.com"
+    EMAIL: str = "test_user@kiterunner.com"
     PASSWORD: Optional[str] = "somepassword"
-    USERNAME: str = "someuser"
+    USERNAME: str = "test_user"
     BIO: str = ""
     IMAGE: str = DEFAULT_AVT_IMAGE
     user_response: Dict
@@ -46,7 +51,7 @@ class TestMixin:
         )
 
     @classmethod
-    def setUpTestData(cls):
+    def setup_test_data(cls):
         _setup_test_data(cls)
 
 
