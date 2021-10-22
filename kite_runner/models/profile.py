@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db import models
 
 
@@ -14,14 +16,14 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
-    def follow(self, profile):
+    def follow(self, profile: Profile) -> None:
         self.following.add(profile)
 
-    def unfollow(self, profile):
+    def unfollow(self, profile: Profile) -> None:
         self.following.remove(profile)
 
-    def is_following(self, profile):
+    def is_following(self, profile: Profile) -> bool:
         return self.following.filter(pk=profile.pk).exists()
 
-    def is_followed_by(self, profile):
+    def is_followed_by(self, profile: Profile) -> bool:
         return self.followed_by.filter(pk=profile.pk).exists()
