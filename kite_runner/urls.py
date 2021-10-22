@@ -8,6 +8,6 @@ urlpatterns = [
     path("api/v1/users/", signup.SignupAPIView.as_view()),
     path("api/v1/users/login/", authentication.LoginViewSet.as_view()),
     path("api/v1/user/", user.UserRetrieveUpdateAPIView.as_view()),
-    path("api/v1/profile/<str:username>", profile.ProfileRetrieveAPIView.as_view()),
-    path("api/v1/profile/<str:username>/follow/", profile.FollowUserAPIView.as_view()),
+    path("api/v1/profiles/<str:username>", profile.ProfileRetrieveAPIView.as_view()),
+    path("api/v1/profiles/<str:username>/follow/", profile.FollowUserAPIView.as_view()),
 ]

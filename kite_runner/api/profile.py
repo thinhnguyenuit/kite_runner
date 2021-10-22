@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from kite_runner.models import Profile, profile
+from kite_runner.models import Profile
 from kite_runner.utils.constants import DEFAULT_AVT_IMAGE
 
 from .renderer import ProfileJSONRenderer
@@ -79,8 +79,15 @@ class FollowUserAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, username):
-        user = request.user
-        followee_profile = Profile.objects.get(user__username=username)
-        user.profile.unfollow(followee_profile)
 
-        return Response(status=status.HTTP_200_OK)
+        follower: Profile = self.request.user.profile
+        try:
+            followee: Profile = self.queryset.get(user__username=username)
+        except Profile.DoesNotExist:
+            raise NotFound(f"Profile with username: {username} not found.")
+
+        follower.unfollow(followee)
+
+        serializer = self.serializer_class(followee, context={"request": request})
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
