@@ -65,8 +65,7 @@ class TestArticleViewset(APIBaseTest):
             data=self.article_data,
             HTTP_AUTHORIZATION=TOKEN_HEADER.format("invalid_token"),
         )
-
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_article_without_token(self):
         response = self.client.post(f"{self.article_url}/", data=self.article_data)
