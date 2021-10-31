@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from django.db.models import QuerySet
 from rest_framework import (generics, mixins, permissions, serializers, status,
@@ -15,14 +15,14 @@ from .profile import ProfileSerializer
 
 
 class TagRelatedField(serializers.RelatedField):
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         return Tag.objects.all()
 
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: Any) -> Tag:
         tag, _ = Tag.objects.get_or_create(tag=data, slug=data.lower())
         return tag
 
-    def to_representation(self, value):
+    def to_representation(self, value: Tag) -> str:
         return value.tag
 
 
@@ -53,13 +53,14 @@ class ArticleSerializer(serializers.ModelSerializer):
             "author",
         )
 
-    def create(self, validated_data: Any) -> Article:
+    def create(self, validated_data: Dict) -> Article:
         author = self.context.get("author", None)
-        tags = validated_data.pop("tag", [])
-        article = Article.objects.create(author=author, **validated_data)
+        tags = validated_data.pop("tags", [])
+        article: Article = Article.objects.create(author=author, **validated_data)
 
         for tag in tags:
             article.tags.add(tag)
+
         return article
 
     def get_favorited(self, instance: Any) -> bool:
@@ -101,6 +102,10 @@ class ArticleViewset(
         if author:
             queryset = queryset.filter(author__user__username=author)
 
+        tag = self.request.query_params.get("tag", None)
+        if tag:
+            queryset = queryset.filter(tags__tag=tag)
+
         favorited_by = self.request.query_params.get("favorited", None)
         if favorited_by:
             queryset = queryset.filter(favorited_by__username=favorited_by)
@@ -111,7 +116,7 @@ class ArticleViewset(
         serializer_context = {"author": request.user.profile, "request": request}
         serializer_data = request.data.get("article", {})
 
-        serializer: ArticleSerializer = self.get_serializer(
+        serializer: ArticleSerializer = self.serializer_class(
             data=serializer_data, context=serializer_context
         )
         serializer.is_valid(raise_exception=True)
