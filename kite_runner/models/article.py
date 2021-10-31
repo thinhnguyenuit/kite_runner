@@ -1,4 +1,5 @@
 from django.db import models
+from django.template.defaultfilters import slugify
 
 
 class Article(models.Model):
@@ -15,3 +16,7 @@ class Article(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    def save(self, *args, **kwargs) -> None:
+        self.slug = slugify(self.title)
+        super().save(*args, **kwargs)

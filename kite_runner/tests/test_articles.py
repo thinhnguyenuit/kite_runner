@@ -33,21 +33,22 @@ class TestArticleViewset(APIBaseTest):
             HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)\
 
         response_data = response.json()
-        self.assertEqual(response_data["article"]["title"], self.article_title)
-        self.assertEqual(
-            response_data["article"]["description"], self.article_description
-        )
-        self.assertEqual(response_data["article"]["body"], self.article_body)
-        self.assertEqual(response_data["article"]["tagList"], self.article_tag_list)
-        self.assertIsNotNone(response_data["article"]["createdAt"])
-        self.assertEqual(
-            response_data["article"]["author"]["username"], self.user.username
-        )
-        self.assertEqual(response_data["article"]["favorited"], False)
-        self.assertEqual(response_data["article"]["favoritesCount"], 0)
+        self.assertIsNotNone(response_data)
+
+        article_data = response_data["article"]
+        self.assertIsNotNone(article_data)
+        self.assertIsNotNone(article_data["slug"])
+        self.assertEqual(article_data["title"], self.article_title)
+        self.assertEqual(article_data["description"], self.article_description)
+        self.assertEqual(article_data["body"], self.article_body)
+        self.assertEqual(article_data["tagList"], self.article_tag_list)
+        self.assertIsNotNone(article_data["createdAt"])
+        self.assertEqual(article_data["author"]["username"], self.user.username)
+        self.assertEqual(article_data["favorited"], False)
+        self.assertEqual(article_data["favoritesCount"], 0)
 
     def test_create_article_with_invalid_data(self) -> None:
         response = self.client.post(
