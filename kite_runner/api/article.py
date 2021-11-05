@@ -12,6 +12,7 @@ from kite_runner.api.renderer import ArticleJSONRenderer
 from kite_runner.models import Article, Tag
 
 from .profile import ProfileSerializer
+from rest_framework.exceptions import NotFound, NotAuthenticated
 
 
 class TagRelatedField(serializers.RelatedField):
@@ -113,6 +114,8 @@ class ArticleViewset(
         return queryset
 
     def create(self, request) -> Response:
+        if not request.user.is_authenticated:
+            raise NotAuthenticated("Authentication credentials were not provided.")
         serializer_context = {"author": request.user.profile, "request": request}
         serializer_data = request.data.get("article", {})
 
@@ -122,3 +125,21 @@ class ArticleViewset(
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def list(self, request) -> Response:
+        serializer_context = {"request": request}
+        page = self.paginate_queryset(self.get_queryset())
+
+        serializer: ArticleSerializer = self.serializer_class(page, context=serializer_context, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    def retrieve(self, request, slug=None) -> Response:
+        serializer_context = {"request": request}
+        try:
+            instance = self.queryset.get(slug=slug)
+        except Article.DoesNotExist:
+            raise NotFound(f"Could not found any article with slug: {slug}")
+
+        serializer = self.serializer_class(instance, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)

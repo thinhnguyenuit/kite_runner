@@ -6,7 +6,7 @@ from kite_runner.api import article, authentication, profile, signup, user
 from rest_framework.routers import DefaultRouter
 
 
-router = DefaultRouter()
+router = DefaultRouter(trailing_slash=False)
 router.register(r"articles", article.ArticleViewset, basename="articles")
 
 urlpatterns = [
