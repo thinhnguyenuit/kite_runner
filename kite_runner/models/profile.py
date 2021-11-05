@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django.db import models
+
 from kite_runner.models import Article
 
 
@@ -13,7 +14,9 @@ class Profile(models.Model):
     following = models.ManyToManyField(
         "self", related_name="followed_by", symmetrical=False
     )
-    favourites = models.ManyToManyField("kite_runner.Article", related_name="favorited_by")
+    favourites = models.ManyToManyField(
+        "kite_runner.Article", related_name="favorited_by"
+    )
 
     def __str__(self):
         return self.user.username

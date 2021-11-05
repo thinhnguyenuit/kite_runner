@@ -1,10 +1,9 @@
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
-
-from kite_runner.api import article, authentication, profile, signup, user
 from rest_framework.routers import DefaultRouter
 
+from kite_runner.api import article, authentication, profile, signup, user
 
 router = DefaultRouter(trailing_slash=False)
 router.register(r"articles", article.ArticleViewset, basename="articles")

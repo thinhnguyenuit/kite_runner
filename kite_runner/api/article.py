@@ -1,18 +1,15 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from django.db.models import QuerySet
-from rest_framework import (generics, mixins, permissions, serializers, status,
-                            viewsets)
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework import mixins, serializers, status, viewsets
+from rest_framework.exceptions import NotAuthenticated, NotFound
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from kite_runner.api.renderer import ArticleJSONRenderer
 from kite_runner.models import Article, Tag
 
 from .profile import ProfileSerializer
-from rest_framework.exceptions import NotFound, NotAuthenticated
 
 
 class TagRelatedField(serializers.RelatedField):
@@ -113,7 +110,7 @@ class ArticleViewset(
 
         return queryset
 
-    def create(self, request) -> Response:
+    def create(self, request: Any) -> Response:
         if not request.user.is_authenticated:
             raise NotAuthenticated("Authentication credentials were not provided.")
         serializer_context = {"author": request.user.profile, "request": request}
@@ -126,14 +123,16 @@ class ArticleViewset(
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def list(self, request) -> Response:
+    def list(self, request: Any) -> Response:
         serializer_context = {"request": request}
         page = self.paginate_queryset(self.get_queryset())
 
-        serializer: ArticleSerializer = self.serializer_class(page, context=serializer_context, many=True)
+        serializer: ArticleSerializer = self.serializer_class(
+            page, context=serializer_context, many=True
+        )
         return self.get_paginated_response(serializer.data)
 
-    def retrieve(self, request, slug=None) -> Response:
+    def retrieve(self, request: Any, slug: Optional[str] = None) -> Response:
         serializer_context = {"request": request}
         try:
             instance = self.queryset.get(slug=slug)

@@ -17,6 +17,6 @@ class Article(models.Model):
     def __str__(self) -> str:
         return self.title
 
-    def save(self, *args, **kwargs) -> None:
+    def save(self, *args, **kwargs) -> None:  # type: ignore
         self.slug = slugify(self.title)
         super().save(*args, **kwargs)
