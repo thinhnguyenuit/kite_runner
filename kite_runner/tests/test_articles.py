@@ -22,10 +22,6 @@ class TestArticleViewset(APIBaseTest):
         }
     }
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setup_test_data()  # type: ignore
-
     def test_create_article(self) -> None:
         response = self.client.post(
             f"{self.article_url}",

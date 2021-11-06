@@ -13,10 +13,6 @@ class TestProfileAPI(APIBaseTest):
     test_password = "12345678"
     test_email = "test1@mail.com"
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setup_test_data()  # type: ignore
-
     def test_get_profile(self):
         response = self.client.get(f"{self.profile_url}/{self.USERNAME}")
 

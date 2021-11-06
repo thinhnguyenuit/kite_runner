@@ -18,7 +18,13 @@ def core_exception_handler(exc, context) -> Response:  # type: ignore
 
 
 def _handle_generic_error(exc, context, response) -> Response:  # type: ignore
-    response.data = {"errors": response.data}
+    if response:
+        response.data = {"errors": response.data}
+    else:
+        response = Response(
+            data={"errors": {"detail": "An error occurred."}},
+            status=500,
+        )
 
     return response
 

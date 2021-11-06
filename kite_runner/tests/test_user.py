@@ -11,10 +11,6 @@ class TestUserAPI(APIBaseTest):
 
     user_api_url = "/api/v1/user/"
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setup_test_data()  # type: ignore
-
     def test_get_current_user(self):
         response = self.client.get(
             self.user_api_url, HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key)

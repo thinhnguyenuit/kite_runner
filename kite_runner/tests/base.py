@@ -43,6 +43,8 @@ class TestMixin:
     IMAGE: str = DEFAULT_AVT_IMAGE
     user_response: Dict
 
+    CLASS_DATA_LEVEL_SETUP = True
+
     user: User
 
     def _create_user(self, email: str, password: str, username: str) -> User:
@@ -51,10 +53,15 @@ class TestMixin:
         )
 
     @classmethod
-    def setup_test_data(cls):
-        _setup_test_data(cls)
+    def setUpTestData(cls) -> None:
+        if cls.CLASS_DATA_LEVEL_SETUP:
+            _setup_test_data(cls)
+
+    def setUp(self) -> None:
+        if not self.CLASS_DATA_LEVEL_SETUP:
+            _setup_test_data(self)
 
 
 class APIBaseTest(TestMixin, ErrorResponseMixin, DRFTestCase):
     def setUp(self) -> None:
-        return super().setUp()
+        super().setUp()

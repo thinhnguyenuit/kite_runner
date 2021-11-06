@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from django.contrib.auth import authenticate
 from rest_framework import permissions, serializers, status
 from rest_framework.response import Response
@@ -16,10 +18,10 @@ class LoginSerializer(serializers.Serializer):
     class Meta:
         fields = ("email", "username", "password", "token")
 
-    def to_representation(self, value):
+    def to_representation(self, value: Any) -> Any:
         return value
 
-    def validate(self, data):
+    def validate(self, data: Dict) -> Dict:
         email = data.get("email", None)
         password = data.get("password", None)
 
@@ -43,7 +45,7 @@ class LoginViewSet(APIView):
     permission_classes = (permissions.AllowAny,)
     renderer_classes = (UserJSONRenderer,)
 
-    def post(self, request):
+    def post(self, request: Any) -> Response:
         user = request.data.get("user", None)
 
         serializer = self.serializer_class(data=user)
