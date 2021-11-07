@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from rest_framework import status
 
 from kite_runner.models import Article, Tag
@@ -22,10 +24,27 @@ class TestArticleViewset(APIBaseTest):
         }
     }
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.article: Article = Article.objects.create(
+            title=self.article_title,
+            author=self.user.profile,
+            description=self.article_description,
+            body=self.article_body,
+        )
+
+        self.tag = Tag.objects.create(tag="training")
+        self.article.tags.set([self.tag])
+
     def test_create_article(self) -> None:
+
+        article_data = deepcopy(self.article_data)
+        article_data["article"]["title"] = "How to train your dragon part 2"
+        article_data["article"]["description"] = "Ever wonder how him got this far?"
+
         response = self.client.post(
             f"{self.article_url}",
-            data=self.article_data,
+            data=article_data,
             HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
         )
 
@@ -36,8 +55,10 @@ class TestArticleViewset(APIBaseTest):
         article_data = response_data["article"]
         self.assertIsNotNone(article_data)
         self.assertIsNotNone(article_data["slug"])
-        self.assertEqual(article_data["title"], self.article_title)
-        self.assertEqual(article_data["description"], self.article_description)
+        self.assertEqual(article_data["title"], "How to train your dragon part 2")
+        self.assertEqual(
+            article_data["description"], "Ever wonder how him got this far?"
+        )
         self.assertEqual(article_data["body"], self.article_body)
         self.assertEqual(article_data["tagList"], self.article_tag_list)
         self.assertIsNotNone(article_data["createdAt"])
@@ -54,7 +75,7 @@ class TestArticleViewset(APIBaseTest):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_create_article_with_invalid_token(self):
+    def test_create_article_with_invalid_token(self) -> None:
         response = self.client.post(
             f"{self.article_url}",
             data=self.article_data,
@@ -62,26 +83,16 @@ class TestArticleViewset(APIBaseTest):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_create_article_without_token(self):
+    def test_create_article_without_token(self) -> None:
         response = self.client.post(f"{self.article_url}", data=self.article_data)
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.json(), self.unauthenticated_response())
 
-    def test_get_article(self):
+    def test_get_articles(self) -> None:  # sourcery skip: class-extract-method
         """
         test get recent articles globally
         """
-
-        article: Article = Article.objects.create(
-            title=self.article_title,
-            author=self.user.profile,
-            description=self.article_description,
-            body=self.article_body,
-        )
-
-        tag = Tag.objects.create(tag="training")
-        article.tags.set([tag])
 
         response = self.client.get(
             f"{self.article_url}",
@@ -103,23 +114,13 @@ class TestArticleViewset(APIBaseTest):
         self.assertEqual(article_data[0]["body"], self.article_body)
         self.assertEqual(article_data[0]["author"]["username"], "test_user")
 
-    def test_get_article_with_slug(self):
+    def test_get_article_with_slug(self) -> None:
         """
         test get article with slug
         """
 
-        article: Article = Article.objects.create(
-            title=self.article_title,
-            author=self.user.profile,
-            description=self.article_description,
-            body=self.article_body,
-        )
-
-        tag = Tag.objects.create(tag="training")
-        article.tags.set([tag])
-
         response = self.client.get(
-            f"{self.article_url}/{article.slug}",
+            f"{self.article_url}/{self.article.slug}",
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -135,7 +136,7 @@ class TestArticleViewset(APIBaseTest):
         self.assertEqual(response_data["article"]["body"], self.article_body)
         self.assertEqual(response_data["article"]["author"]["username"], "test_user")
 
-    def test_get_article_with_slug_not_found(self):
+    def test_get_article_with_slug_not_found(self) -> None:
         """
         test get article with invalid slug
         """
@@ -148,4 +149,60 @@ class TestArticleViewset(APIBaseTest):
         self.assertEqual(
             response.json(),
             self.not_found_response("Could not found any article with slug: some_slug"),
+        )
+
+    def test_get_articles_by_author(self) -> None:
+
+        response = self.client.get(
+            f"{self.article_url}?author={self.user.username}",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response_data = response.json()
+        self.assertIsNotNone(response_data)
+        self.assertIsNotNone(response_data["articles"])
+        self.assertEqual(len(response_data["articles"]), 1)
+        self.assertEqual(response_data["count"], 1)
+
+        article_data = response_data["articles"]
+        self.assertIsNotNone(article_data)
+        self.assertEqual(article_data[0]["title"], self.article_title)
+        self.assertEqual(article_data[0]["description"], self.article_description)
+        self.assertEqual(article_data[0]["tagList"], ["training"])
+        self.assertEqual(article_data[0]["body"], self.article_body)
+        self.assertEqual(article_data[0]["author"]["username"], "test_user")
+
+    def test_get_articles_by_author_not_found(self) -> None:
+        response = self.client.get(
+            f"{self.article_url}?author=not_exist_author",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()["articles"]), 0)
+
+    def test_update_article(self) -> None:
+
+        updated_article_data = {
+            "article": {
+                "title": "updated_title",
+                "description": "updated_description",
+                "body": "updated_body",
+                "tagList": ["updated_tag1", "updated_tag2"],
+            }
+        }
+        response = self.client.put(
+            f"{self.article_url}/{self.article.slug}",
+            data=updated_article_data,
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["article"]["title"], "updated_title")
+        self.assertEqual(
+            response.json()["article"]["description"], "updated_description"
+        )
+        self.assertEqual(response.json()["article"]["body"], "updated_body")
+        self.assertEqual(
+            response.json()["article"]["tagList"], ["updated_tag1", "updated_tag2"]
         )

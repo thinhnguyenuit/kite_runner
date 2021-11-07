@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from django.db.models import QuerySet
 from rest_framework import mixins, serializers, status, viewsets
@@ -132,7 +132,7 @@ class ArticleViewset(
         )
         return self.get_paginated_response(serializer.data)
 
-    def retrieve(self, request: Any, slug: Optional[str] = None) -> Response:
+    def retrieve(self, request: Any, slug: str) -> Response:
         serializer_context = {"request": request}
         try:
             instance = self.queryset.get(slug=slug)
@@ -140,5 +140,23 @@ class ArticleViewset(
             raise NotFound(f"Could not found any article with slug: {slug}")
 
         serializer = self.serializer_class(instance, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request: Any, slug: str) -> Response:
+        serializer_context = {"request": request}
+
+        try:
+            instance = self.queryset.get(slug=slug)
+        except Article.DoesNotExist:
+            raise NotFound(f"Could not found any article with slug: {slug}")
+
+        serializer_data = request.data.get("article", {})
+
+        serializer = self.serializer_class(
+            instance, context=serializer_context, data=serializer_data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
