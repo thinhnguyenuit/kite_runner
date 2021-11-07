@@ -20,3 +20,10 @@ class ProfileJSONRenderer(KRJSONRenderer):
     object_label = "profile"
     pagination_object_label = "profiles"
     pagination_count_label = "profilesCount"
+
+
+class ArticleJSONRenderer(KRJSONRenderer):
+    charset = "utf-8"
+    object_label = "article"
+    pagination_object_label = "articles"
+    pagination_count_label = "articlesCount"

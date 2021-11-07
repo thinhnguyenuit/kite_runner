@@ -56,7 +56,7 @@ const actions = {
   [CHECK_AUTH](context) {
     if (JwtService.getToken()) {
       ApiService.setHeader();
-      ApiService.get("user/")
+      ApiService.get("user")
         .then(({ data }) => {
           context.commit(SET_AUTH, data.user);
         })

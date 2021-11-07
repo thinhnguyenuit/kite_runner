@@ -5,7 +5,6 @@ from rest_framework.views import exception_handler
 def core_exception_handler(exc, context) -> Response:  # type: ignore
     response = exception_handler(exc, context)
     handlers = {
-        "ValidationError": _handle_generic_error,
         "NotFound": _handle_not_found,
         "NotAuthenticated": _handle_not_authenticated,
     }
@@ -15,12 +14,18 @@ def core_exception_handler(exc, context) -> Response:  # type: ignore
     if exception_class in handlers:
         return handlers[exception_class](exc, context, response)
 
-    return response
+    return _handle_generic_error(exc, context, response)
 
 
 def _handle_generic_error(exc, context, response) -> Response:  # type: ignore
-    response.data = {"errors": response.data}
-    response.status_code = 400
+    if response:
+        response.data = {"errors": response.data}
+    else:
+        response = Response(
+            data={"errors": {"detail": "An error occurred."}},
+            status=500,
+        )
+
     return response
 
 

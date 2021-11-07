@@ -4,7 +4,7 @@ from .base import APIBaseTest
 
 
 class TestAuthentication(APIBaseTest):
-    def test_user_login(self):
+    def test_user_login(self) -> None:
         response = self.client.post(
             "/api/v1/users/login/",
             {"user": {"email": self.EMAIL, "password": self.PASSWORD}},
@@ -13,7 +13,7 @@ class TestAuthentication(APIBaseTest):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()["user"]["email"], self.user.email)
 
-    def test_user_login_wrong_password(self):
+    def test_user_login_wrong_password(self) -> None:
         response = self.client.post(
             "/api/v1/users/login/",
             {"user": {"email": self.EMAIL, "password": "wrong_password"}},
