@@ -16,4 +16,8 @@ urlpatterns = [
     path("api/v1/user/", user.UserRetrieveUpdateAPIView.as_view()),
     path("api/v1/profiles/<str:username>", profile.ProfileRetrieveAPIView.as_view()),
     path("api/v1/profiles/<str:username>/follow/", profile.FollowUserAPIView.as_view()),
+    path(
+        "api/v1/articles/<str:slug>/favorite/",
+        article.ArticlesFavoriteAPIView.as_view(),
+    ),
 ]

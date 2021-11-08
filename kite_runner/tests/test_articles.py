@@ -32,9 +32,11 @@ class TestArticleViewset(APIBaseTest):
             description=self.article_description,
             body=self.article_body,
         )
-
-        self.tag = Tag.objects.create(tag="training")
-        self.article.tags.set([self.tag])
+        tags = []
+        for tag_data in self.article_tag_list:
+            tag = Tag.objects.create(tag=tag_data)
+            tags.append(tag)
+        self.article.tags.set(tags)
 
     def test_create_article(self) -> None:
 
@@ -110,11 +112,11 @@ class TestArticleViewset(APIBaseTest):
         self.assertIsNotNone(article_data)
         self.assertEqual(article_data[0]["title"], self.article_title)
         self.assertEqual(article_data[0]["description"], self.article_description)
-        self.assertEqual(article_data[0]["tagList"], ["training"])
+        self.assertEqual(article_data[0]["tagList"], self.article_tag_list)
         self.assertEqual(article_data[0]["body"], self.article_body)
         self.assertEqual(article_data[0]["author"]["username"], "test_user")
 
-    def test_get_article_with_slug(self) -> None:
+    def test_get_article_by_slug(self) -> None:
         """
         test get article with slug
         """
@@ -132,11 +134,11 @@ class TestArticleViewset(APIBaseTest):
         self.assertEqual(
             response_data["article"]["description"], self.article_description
         )
-        self.assertEqual(response_data["article"]["tagList"], ["training"])
+        self.assertEqual(response_data["article"]["tagList"], self.article_tag_list)
         self.assertEqual(response_data["article"]["body"], self.article_body)
         self.assertEqual(response_data["article"]["author"]["username"], "test_user")
 
-    def test_get_article_with_slug_not_found(self) -> None:
+    def test_get_article_by_slug_not_found(self) -> None:
         """
         test get article with invalid slug
         """
@@ -169,7 +171,7 @@ class TestArticleViewset(APIBaseTest):
         self.assertIsNotNone(article_data)
         self.assertEqual(article_data[0]["title"], self.article_title)
         self.assertEqual(article_data[0]["description"], self.article_description)
-        self.assertEqual(article_data[0]["tagList"], ["training"])
+        self.assertEqual(article_data[0]["tagList"], self.article_tag_list)
         self.assertEqual(article_data[0]["body"], self.article_body)
         self.assertEqual(article_data[0]["author"]["username"], "test_user")
 
@@ -177,6 +179,32 @@ class TestArticleViewset(APIBaseTest):
         response = self.client.get(
             f"{self.article_url}?author=not_exist_author",
         )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()["articles"]), 0)
+
+    def test_get_articles_by_tag(self) -> None:
+        response = self.client.get(
+            f"{self.article_url}?tag=training",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = response.json()
+        self.assertIsNotNone(response_data)
+        self.assertIsNotNone(response_data["articles"])
+        self.assertEqual(len(response_data["articles"]), 1)
+        self.assertEqual(response_data["count"], 1)
+
+        article_data = response_data["articles"]
+        self.assertIsNotNone(article_data)
+        self.assertEqual(article_data[0]["title"], self.article_title)
+        self.assertEqual(article_data[0]["description"], self.article_description)
+        self.assertEqual(article_data[0]["tagList"], self.article_tag_list)
+        self.assertEqual(article_data[0]["body"], self.article_body)
+        self.assertEqual(article_data[0]["author"]["username"], "test_user")
+
+    def test_get_articles_by_tag_not_found(self) -> None:
+        response = self.client.get(f"{self.article_url}?tag=not_found_tag")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()["articles"]), 0)
@@ -205,4 +233,49 @@ class TestArticleViewset(APIBaseTest):
         self.assertEqual(response.json()["article"]["body"], "updated_body")
         self.assertEqual(
             response.json()["article"]["tagList"], ["updated_tag1", "updated_tag2"]
+        )
+
+    def test_favorite_article(self) -> None:
+
+        response = self.client.post(
+            f"{self.article_url}/{self.article.slug}/favorite/",
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response_data = response.json()
+        self.assertIsNotNone(response_data)
+        self.assertIsNotNone(response_data["article"])
+        self.assertEqual(response_data["article"]["title"], self.article_title)
+        self.assertEqual(
+            response_data["article"]["description"], self.article_description
+        )
+        self.assertEqual(response_data["article"]["tagList"], self.article_tag_list)
+        self.assertEqual(response_data["article"]["body"], self.article_body)
+        self.assertEqual(response_data["article"]["favoritesCount"], 1)
+        self.assertEqual(response_data["article"]["favorited"], True)
+
+    def test_favorite_article_already_favorited(self) -> None:
+
+        response = self.client.post(
+            f"{self.article_url}/{self.article.slug}/favorite/",
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_favorite_article_not_found(self) -> None:
+
+        response = self.client.post(
+            f"{self.article_url}/not_exist_slug/favorite/",
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.json(),
+            self.not_found_response(
+                "Could not found any article with slug: not_exist_slug"
+            ),
         )
