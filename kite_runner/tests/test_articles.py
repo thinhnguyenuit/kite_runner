@@ -279,3 +279,23 @@ class TestArticleViewset(APIBaseTest):
                 "Could not found any article with slug: not_exist_slug"
             ),
         )
+
+    def test_get_article_feed(self) -> None:
+
+        response = self.client.get(
+            f"{self.article_url}/feed/",
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()["articles"]), 1)
+
+    def test_get_article_feed_not_found(self) -> None:
+
+        response = self.client.get(
+            f"{self.article_url}/feed/",
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()["articles"]), 0)

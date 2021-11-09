@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 from django.db.models import QuerySet
-from rest_framework import mixins, serializers, status, viewsets
+from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.exceptions import NotAuthenticated, NotFound
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
@@ -196,3 +196,23 @@ class ArticlesFavoriteAPIView(APIView):
         serializer = self.serializer_class(article, context=serializer_context)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ArticlesFeedAPIView(generics.ListAPIView):
+    queryset = Article.objects.all()
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (ArticleJSONRenderer,)
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self) -> QuerySet:
+        return Article.objects.filter(
+            author__in=self.request.user.profile.following.all()
+        )
+
+    def list(self, request: Any) -> Response:
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        serlizer_context = {"request": request}
+        serializer = self.serializer_class(page, context=serlizer_context, many=True)
+        return self.get_paginated_response(serializer.data)
