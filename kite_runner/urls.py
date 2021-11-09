@@ -3,7 +3,7 @@ from django.urls import path
 from django.urls.conf import include
 from rest_framework.routers import DefaultRouter
 
-from kite_runner.api import article, authentication, profile, signup, user
+from kite_runner.api import article, authentication, profile, signup, user, tag
 
 router = DefaultRouter(trailing_slash=False)
 router.register(r"articles", article.ArticleViewset, basename="articles")
@@ -21,4 +21,5 @@ urlpatterns = [
         "api/v1/articles/<str:slug>/favorite/",
         article.ArticlesFavoriteAPIView.as_view(),
     ),
+    path("api/v1/tags/", tag.TagListAPIView.as_view()),
 ]
