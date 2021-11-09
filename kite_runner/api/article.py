@@ -1,10 +1,9 @@
 from typing import Any, Dict
 
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.exceptions import NotAuthenticated, NotFound
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -206,7 +205,8 @@ class ArticlesFeedAPIView(generics.ListAPIView):
 
     def get_queryset(self) -> QuerySet:
         return Article.objects.filter(
-            author__in=self.request.user.profile.following.all()
+            Q(author__in=self.request.user.profile.following.all())
+            | Q(author=self.request.user.profile)
         )
 
     def list(self, request: Any) -> Response:
