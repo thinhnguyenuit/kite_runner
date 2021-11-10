@@ -3,7 +3,8 @@ from typing import Any, Dict
 from django.db.models import Q, QuerySet
 from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.exceptions import NotAuthenticated, NotFound
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 

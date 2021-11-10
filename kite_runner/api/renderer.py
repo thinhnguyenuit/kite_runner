@@ -2,7 +2,6 @@ from kite_runner.renderer import KRJSONRenderer
 
 
 class UserJSONRenderer(KRJSONRenderer):
-    charset = "utf-8"
     object_label = "user"
     pagination_object_label = "users"
     pagination_count_label = "usersCount"
@@ -16,14 +15,18 @@ class UserJSONRenderer(KRJSONRenderer):
 
 
 class ProfileJSONRenderer(KRJSONRenderer):
-    charset = "utf-8"
     object_label = "profile"
     pagination_object_label = "profiles"
     pagination_count_label = "profilesCount"
 
 
 class ArticleJSONRenderer(KRJSONRenderer):
-    charset = "utf-8"
     object_label = "article"
     pagination_object_label = "articles"
     pagination_count_label = "articlesCount"
+
+
+class CommentJSONRenderer(KRJSONRenderer):
+    object_label = "comment"
+    pagination_object_label = "comments"
+    pagination_count_label = "commentsCount"

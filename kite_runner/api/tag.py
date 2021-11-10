@@ -1,9 +1,10 @@
 from typing import Any
-from kite_runner.models import Tag
-from rest_framework import serializers, generics
-from rest_framework.response import Response
+
+from rest_framework import generics, serializers, status
 from rest_framework.permissions import AllowAny
-from rest_framework import status
+from rest_framework.response import Response
+
+from kite_runner.models import Tag
 
 
 class TagSerializer(serializers.ModelSerializer):

@@ -191,3 +191,20 @@ MANAGERS = ADMINS
 APPEND_SLASH = True
 CORS_URLS_REGEX = r"^/api/.*$"
 AUTH_USER_MODEL = "kite_runner.User"
+
+# Setup logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s " "%(message)s"}
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {"level": "INFO", "handlers": ["console"]},
+}
