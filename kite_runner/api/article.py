@@ -87,6 +87,7 @@ class ArticleViewset(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     lookup_field = "slug"
@@ -162,6 +163,15 @@ class ArticleViewset(
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request: Any, slug: str) -> Response:
+        try:
+            article = self.queryset.get(slug=slug)
+        except Article.DoesNotExist:
+            raise NotFound(f"Could not found any article with slug: {slug}")
+
+        article.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
 class ArticlesFavoriteAPIView(APIView):

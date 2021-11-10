@@ -289,3 +289,13 @@ class TestArticleViewset(APIBaseTest):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()["articles"]), 1)
+
+
+    def test_delete_article(self) -> None:
+
+        response = self.client.delete(
+            f"{self.article_url}/{self.article.slug}",
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
