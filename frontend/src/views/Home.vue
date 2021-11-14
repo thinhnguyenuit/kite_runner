@@ -23,7 +23,6 @@
               <li class="nav-item">
                 <router-link
                   :to="{ name: 'home' }"
-                  exact
                   class="nav-link"
                   active-class="active"
                 >
@@ -36,7 +35,7 @@
                   class="nav-link"
                   active-class="active"
                 >
-                  <i class="ion-pound"></i> {{ tag }}
+                  <em class="ion-pound"></em> {{ tag }}
                 </router-link>
               </li>
             </ul>

@@ -32,7 +32,7 @@ const actions = {
   },
   [FETCH_PROFILE_FOLLOW](context, payload) {
     const { username } = payload;
-    return ApiService.post(`profiles/${username}/follow`)
+    return ApiService.post(`profiles/${username}/follow/`)
       .then(({ data }) => {
         context.commit(SET_PROFILE, data.profile);
         return data;
@@ -44,7 +44,7 @@ const actions = {
   },
   [FETCH_PROFILE_UNFOLLOW](context, payload) {
     const { username } = payload;
-    return ApiService.delete(`profiles/${username}/follow`)
+    return ApiService.delete(`profiles/${username}/follow/`)
       .then(({ data }) => {
         context.commit(SET_PROFILE, data.profile);
         return data;
