@@ -11,12 +11,12 @@ const state = {
   tags: [],
   articles: [],
   isLoading: true,
-  articlesCount: 0,
+  count: 0,
 };
 
 const getters = {
-  articlesCount(state) {
-    return state.articlesCount;
+  count(state) {
+    return state.count;
   },
   articles(state) {
     return state.articles;
@@ -56,9 +56,9 @@ const mutations = {
   [FETCH_START](state) {
     state.isLoading = true;
   },
-  [FETCH_END](state, { articles, articlesCount }) {
+  [FETCH_END](state, { articles, count }) {
     state.articles = articles;
-    state.articlesCount = articlesCount;
+    state.count = count;
     state.isLoading = false;
   },
   [SET_TAGS](state, tags) {

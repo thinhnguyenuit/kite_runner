@@ -33,10 +33,10 @@ class Profile(models.Model):
     def is_followed_by(self, profile: Profile) -> bool:
         return self.followed_by.filter(pk=profile.pk).exists()
 
-    def favourite(self, article: Article) -> None:
+    def favorite(self, article: Article) -> None:
         self.favourites.add(article)
 
-    def unfavourite(self, article: Article) -> None:
+    def unfavorite(self, article: Article) -> None:
         self.favourites.remove(article)
 
     def has_favorited(self, article: Article) -> bool:

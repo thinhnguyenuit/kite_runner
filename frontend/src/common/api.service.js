@@ -13,7 +13,8 @@ const ApiService = {
   setHeader() {
     Vue.axios.defaults.headers.common[
       "Authorization"
-    ] = `Token ${JwtService.getToken()}`;
+    ] = `Bearer ${JwtService.getToken()}`;
+    Vue.axios.defaults.headers.common["Content-Type"] = "application/json";
   },
 
   query(resource, params) {
@@ -57,7 +58,7 @@ export const TagsService = {
 
 export const ArticlesService = {
   query(type, params) {
-    return ApiService.query("articles" + (type === "feed" ? "/feed" : ""), {
+    return ApiService.query("articles" + (type === "feed" ? "/feed" : "/"), {
       params: params,
     });
   },
@@ -86,21 +87,21 @@ export const CommentsService = {
   },
 
   post(slug, payload) {
-    return ApiService.post(`articles/${slug}/comments`, {
+    return ApiService.post(`articles/${slug}/comments/`, {
       comment: { body: payload },
     });
   },
 
   destroy(slug, commentId) {
-    return ApiService.delete(`articles/${slug}/comments/${commentId}`);
+    return ApiService.delete(`articles/${slug}/comments/${commentId}/`);
   },
 };
 
 export const FavoriteService = {
   add(slug) {
-    return ApiService.post(`articles/${slug}/favorite`);
+    return ApiService.post(`articles/${slug}/favorite/`);
   },
   remove(slug) {
-    return ApiService.delete(`articles/${slug}/favorite`);
+    return ApiService.delete(`articles/${slug}/favorite/`);
   },
 };

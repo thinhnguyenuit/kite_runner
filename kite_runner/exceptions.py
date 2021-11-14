@@ -1,8 +1,14 @@
+import logging
+
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
+logger = logging.getLogger(__name__)
+
 
 def core_exception_handler(exc, context) -> Response:  # type: ignore
+    logger.error(exc)
+    logger.error(context)
     response = exception_handler(exc, context)
     handlers = {
         "NotFound": _handle_not_found,

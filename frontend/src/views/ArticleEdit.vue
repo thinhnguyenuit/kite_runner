@@ -7,6 +7,7 @@
           <form @submit.prevent="onPublish(article.slug)">
             <fieldset :disabled="inProgress">
               <fieldset class="form-group">
+                <legend>Article Title</legend>
                 <input
                   type="text"
                   class="form-control form-control-lg"
@@ -15,6 +16,7 @@
                 />
               </fieldset>
               <fieldset class="form-group">
+                <legend>Article Description</legend>
                 <input
                   type="text"
                   class="form-control"
@@ -23,6 +25,7 @@
                 />
               </fieldset>
               <fieldset class="form-group">
+                <legend>Content</legend>
                 <textarea
                   class="form-control"
                   rows="8"
@@ -32,6 +35,7 @@
                 </textarea>
               </fieldset>
               <fieldset class="form-group">
+                <legend>Tag</legend>
                 <input
                   type="text"
                   class="form-control"
@@ -45,7 +49,7 @@
                     v-for="(tag, index) of article.tagList"
                     :key="tag + index"
                   >
-                    <i class="ion-close-round" @click="removeTag(tag)"> </i>
+                    <em class="ion-close-round" @click="removeTag(tag)"> </em>
                     {{ tag }}
                   </span>
                 </div>

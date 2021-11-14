@@ -78,14 +78,14 @@ export default {
       };
     },
     pages() {
-      if (this.isLoading || this.articlesCount <= this.itemsPerPage) {
+      if (this.isLoading || this.count <= this.itemsPerPage) {
         return [];
       }
       return [
-        ...Array(Math.ceil(this.articlesCount / this.itemsPerPage)).keys(),
+        ...Array(Math.ceil(this.count / this.itemsPerPage)).keys(),
       ].map((e) => e + 1);
     },
-    ...mapGetters(["articlesCount", "isLoading", "articles"]),
+    ...mapGetters(["count", "isLoading", "articles"]),
   },
   watch: {
     currentPage(newValue) {
@@ -114,6 +114,7 @@ export default {
   },
   methods: {
     fetchArticles() {
+      console.log(this.listConfig);
       this.$store.dispatch(FETCH_ARTICLES, this.listConfig);
     },
     resetPagination() {

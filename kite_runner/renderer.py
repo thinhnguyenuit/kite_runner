@@ -10,6 +10,8 @@ class KRJSONRenderer(JSONRenderer):
     pagination_object_count = "count"
 
     def render(self, data, media_type=None, renderer_context=None):
+        if not data:
+            return json.dumps({})
         if data.get("results", None) is not None:
             return json.dumps(
                 {

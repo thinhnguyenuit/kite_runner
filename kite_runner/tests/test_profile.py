@@ -2,6 +2,7 @@ from rest_framework import status
 
 from kite_runner.models import User
 from kite_runner.utils.constants import TOKEN_HEADER
+from kite_runner.utils.tokens import get_user_token
 
 from .base import APIBaseTest
 
@@ -12,6 +13,10 @@ class TestProfileAPI(APIBaseTest):
     test_username = "test_user1"
     test_password = "12345678"
     test_email = "test1@mail.com"
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.token = get_user_token(self.user)
 
     def test_get_profile(self):
         response = self.client.get(f"{self.profile_url}/{self.USERNAME}")
@@ -49,7 +54,7 @@ class TestProfileAPI(APIBaseTest):
 
         response = self.client.post(
             f"{self.profile_url}/{self.test_username}/follow/",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -68,7 +73,7 @@ class TestProfileAPI(APIBaseTest):
     def test_follow_profile_not_found(self):
         response = self.client.post(
             f"{self.profile_url}/user_not_found/follow/",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -93,7 +98,7 @@ class TestProfileAPI(APIBaseTest):
 
         response = self.client.post(
             f"{self.profile_url}/{self.test_username}/follow/",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -108,7 +113,7 @@ class TestProfileAPI(APIBaseTest):
 
         response = self.client.delete(
             f"{self.profile_url}/{self.test_username}/follow/",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

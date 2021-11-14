@@ -1,6 +1,5 @@
 from typing import Any, Dict, Optional
 
-from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase as DRFTestCase
 
 from kite_runner.models import User
@@ -11,11 +10,9 @@ def _setup_test_data(klass: Any) -> None:
     klass.user = User.objects.create_user(
         email=klass.EMAIL, password=klass.PASSWORD, username=klass.USERNAME
     )
-    klass.token = Token.objects.get_or_create(user=klass.user)
     klass.user_response = {
         "user": {
             "email": klass.EMAIL,
-            "token": klass.token[0].key,
             "username": klass.USERNAME,
             "bio": klass.BIO,
             "image": klass.IMAGE,

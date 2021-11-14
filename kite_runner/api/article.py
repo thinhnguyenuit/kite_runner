@@ -1,13 +1,15 @@
 from typing import Any, Dict
 
-from django.db.models import QuerySet
-from rest_framework import mixins, serializers, status, viewsets
+from django.db.models import Q, QuerySet
+from rest_framework import generics, mixins, serializers, status, viewsets
 from rest_framework.exceptions import NotAuthenticated, NotFound
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from kite_runner.api.renderer import ArticleJSONRenderer
-from kite_runner.models import Article, Tag
+from kite_runner.models import Article, Profile, Tag
 
 from .profile import ProfileSerializer
 
@@ -85,6 +87,7 @@ class ArticleViewset(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
     lookup_field = "slug"
@@ -160,3 +163,67 @@ class ArticleViewset(
         serializer.save()
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request: Any, slug: str) -> Response:
+        try:
+            article = self.queryset.get(slug=slug)
+        except Article.DoesNotExist:
+            raise NotFound(f"Could not found any article with slug: {slug}")
+
+        article.delete()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
+class ArticlesFavoriteAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (ArticleJSONRenderer,)
+    serializer_class = ArticleSerializer
+
+    def delete(self, request: Any, slug: str) -> Response:
+        profile: Profile = self.request.user.profile
+        serializer_context = {"request": request}
+
+        try:
+            article: Article = Article.objects.get(slug=slug)
+        except Article.DoesNotExist:
+            raise NotFound(f"Could not found any article with slug: {slug}")
+
+        profile.unfavorite(article)
+        serializer = self.serializer_class(article, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request: Any, slug: str) -> Response:
+        profile: Profile = self.request.user.profile
+        serializer_context = {"request": request}
+
+        try:
+            article: Article = Article.objects.get(slug=slug)
+        except Article.DoesNotExist:
+            raise NotFound(f"Could not found any article with slug: {slug}")
+
+        profile.favorite(article)
+        serializer = self.serializer_class(article, context=serializer_context)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ArticlesFeedAPIView(generics.ListAPIView):
+    queryset = Article.objects.all()
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (ArticleJSONRenderer,)
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self) -> QuerySet:
+        return Article.objects.filter(
+            Q(author__in=self.request.user.profile.following.all())
+            | Q(author=self.request.user.profile)
+        )
+
+    def list(self, request: Any) -> Response:
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+
+        serlizer_context = {"request": request}
+        serializer = self.serializer_class(page, context=serlizer_context, many=True)
+        return self.get_paginated_response(serializer.data)
