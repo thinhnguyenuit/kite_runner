@@ -1,9 +1,4 @@
-from typing import cast
-
 from rest_framework import status
-
-from kite_runner.models import User
-from kite_runner.utils import tokens
 
 from .base import APIBaseTest
 
@@ -26,21 +21,10 @@ class TestSignupAPI(APIBaseTest):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        user = cast(User, User.objects.get(username="someuser"))
-        token = tokens.get_user_token(user)
-
         self.assertEqual(
-            response.json(),
-            {
-                "user": {
-                    "username": "someuser",
-                    "email": "test@mail.com",
-                    "token": token,
-                    "bio": "",
-                    "image": "https://www.gravatar.com/avatar/73af357c60e22857eda9a5dbf106e2f0",
-                }
-            },
+            response.data["username"], self.user_test_data["user"]["username"]
         )
+        self.assertEqual(response.data["email"], self.user_test_data["user"]["email"])
 
     def test_api_sign_up_already_exist(self):
         self.client.post(

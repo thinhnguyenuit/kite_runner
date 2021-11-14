@@ -4,6 +4,7 @@ from rest_framework import status
 
 from kite_runner.models import Article, Tag
 from kite_runner.utils.constants import TOKEN_HEADER
+from kite_runner.utils.tokens import get_user_token
 
 from .base import APIBaseTest
 
@@ -38,6 +39,8 @@ class TestArticleViewset(APIBaseTest):
             tags.append(tag)
         self.article.tags.set(tags)
 
+        self.token = get_user_token(self.user)
+
     def test_create_article(self) -> None:
 
         article_data = deepcopy(self.article_data)
@@ -47,7 +50,7 @@ class TestArticleViewset(APIBaseTest):
         response = self.client.post(
             f"{self.article_url}",
             data=article_data,
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -72,7 +75,7 @@ class TestArticleViewset(APIBaseTest):
         response = self.client.post(
             f"{self.article_url}",
             data={"article": {"title": self.article_title}},
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -222,7 +225,7 @@ class TestArticleViewset(APIBaseTest):
         response = self.client.put(
             f"{self.article_url}/{self.article.slug}",
             data=updated_article_data,
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -239,7 +242,7 @@ class TestArticleViewset(APIBaseTest):
 
         response = self.client.post(
             f"{self.article_url}/{self.article.slug}/favorite/",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -260,7 +263,7 @@ class TestArticleViewset(APIBaseTest):
 
         response = self.client.post(
             f"{self.article_url}/{self.article.slug}/favorite/",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -269,7 +272,7 @@ class TestArticleViewset(APIBaseTest):
 
         response = self.client.post(
             f"{self.article_url}/not_exist_slug/favorite/",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -284,18 +287,17 @@ class TestArticleViewset(APIBaseTest):
 
         response = self.client.get(
             f"{self.article_url}/feed/",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()["articles"]), 1)
 
-
     def test_delete_article(self) -> None:
 
         response = self.client.delete(
             f"{self.article_url}/{self.article.slug}",
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

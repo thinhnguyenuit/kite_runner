@@ -1,10 +1,13 @@
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from kite_runner.models import User
 
 
-def get_user_token(User: "User") -> str:
+def get_user_token(user: User) -> str:
     """
     Returns the token for the current user.
     """
-    return Token.objects.get(user=User).key
+
+    refresh = RefreshToken.for_user(user)
+
+    return str(refresh.access_token)

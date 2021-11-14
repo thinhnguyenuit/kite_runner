@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
 
 from kite_runner.api import (article, authentication, comment, profile, signup,
                              tag, user)
@@ -10,6 +12,8 @@ router = DefaultRouter(trailing_slash=False)
 router.register(r"articles", article.ArticleViewset, basename="articles")
 
 urlpatterns = [
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path(r"api/v1/", include(router.urls)),
     path("admin/", admin.site.urls),
     path("api/v1/users/", signup.SignupAPIView.as_view()),

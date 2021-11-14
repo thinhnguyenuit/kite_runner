@@ -2,6 +2,7 @@ from rest_framework import status
 
 from kite_runner.models import Article, Comment
 from kite_runner.utils.constants import TOKEN_HEADER
+from kite_runner.utils.tokens import get_user_token
 
 from .base import APIBaseTest
 
@@ -18,6 +19,7 @@ class TestCommentAPIView(APIBaseTest):
         self.comment: Comment = Comment.objects.create(
             body="Test Comment", article=self.article, author=self.user.profile
         )
+        self.token = get_user_token(self.user)
 
     def test_get_all_comments_for_article(self) -> None:
         response = self.client.get(f"/api/v1/articles/{self.article.slug}/comments/")
@@ -42,7 +44,7 @@ class TestCommentAPIView(APIBaseTest):
         response = self.client.post(
             f"/api/v1/articles/{self.article.slug}/comments/",
             {"comment": {"body": "New Comment"}},
-            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token[0].key),
+            HTTP_AUTHORIZATION=TOKEN_HEADER.format(self.token),
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
